@@ -45,12 +45,11 @@ jobs:
 
     - name: Build with Gradle
       run: |
-        chmod +x gradlew
-        ./gradlew packageDevAndLocate
+        bash ./gradlew packageDevAndLocate
 
     - name: Organize files
       run: |
-        cp ./target/*.apk /workdir/
+        cp ./build/assemble/*.apk /workdir/
 
     - name: Generate release tag
       id: tag
@@ -59,7 +58,6 @@ jobs:
         echo "::set-output name=release_tag::$release_tag"
 
     - name: Upload to release
-      if: startsWith(github.ref, 'refs/tags/')
       uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}

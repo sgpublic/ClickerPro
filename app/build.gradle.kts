@@ -1,5 +1,8 @@
 @file:Suppress("PropertyName")
 
+import android.databinding.tool.util.StringUtils
+import com.android.build.gradle.internal.api.BaseVariantOutputImpl
+import org.gradle.internal.os.OperatingSystem
 import java.security.MessageDigest
 import java.text.SimpleDateFormat
 import java.util.*
@@ -21,14 +24,18 @@ val GIT_HEAD: String get() = Runtime.getRuntime()
 val GITHUB_REPO: String get() {
     val remote = Runtime.getRuntime()
         .exec("git remote get-url origin")
-        .inputStream.reader().readText()
+        .inputStream.reader().readLines()[0].let {
+            if (it.endsWith(".git")) return@let it
+            else return@let "$it.git"
+        }
     val repo = Pattern.compile("github.com/(.*?).git")
     val matcher = repo.matcher(remote)
     if (!matcher.find()) {
-        throw IllegalStateException()
+        throw IllegalStateException(remote)
     }
     val result = matcher.group(0)
-    return result.substring(11, result.length - 4)
+    return result.replace("github.com/", "")
+        .replace(".git", "")
 }
 
 val DATED_VERSION: Int get() = Integer.parseInt(
@@ -68,26 +75,29 @@ android {
     compileSdk = 33
     buildToolsVersion = "33.0.0"
 
-    val signInfoExit: Boolean = file("./gradle.properties").exists()
+    val properties = file("./sign/sign.properties");
+    val signInfoExit: Boolean = properties.exists()
 
     if (signInfoExit){
+        val keyProps = Properties()
+        keyProps.load(properties.inputStream())
         signingConfigs {
             @Suppress("LocalVariableName")
             create(SIGN_CONFIG) {
-                val SIGN_DIR: String by project
-                val SIGN_PASSWORD_STORE: String by project
-                val SIGN_ALIAS: String by project
-                val SIGN_PASSWORD_KEY: String by project
+                val SIGN_DIR: String by keyProps
+                val SIGN_PASSWORD_STORE: String by keyProps
+                val SIGN_ALIAS: String by keyProps
+                val SIGN_PASSWORD_KEY: String by keyProps
+                keyPassword = SIGN_PASSWORD_KEY
+                keyAlias = SIGN_ALIAS
                 storeFile = file(SIGN_DIR)
                 storePassword = SIGN_PASSWORD_STORE
-                keyAlias = SIGN_ALIAS
-                keyPassword = SIGN_PASSWORD_KEY
             }
         }
     }
 
     defaultConfig {
-        applicationId = "io.github.sgpublic.clickerpro"
+        applicationId = "io.github.clickerpro"
         minSdk = 26
         targetSdk = 33
         versionCode = COMMIT_VERSION
@@ -166,11 +176,11 @@ android {
         versionProps.store(VERSION_PROPERTIES.writer(), null)
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
     kotlinOptions {
-        jvmTarget = "17"
+        jvmTarget = "11"
     }
 }
 
@@ -210,4 +220,36 @@ dependencies {
     // https://github.com/tony19/logback-android
     // 配置文件位于 /assets/logback.xml
     implementation("com.github.tony19:logback-android:2.0.0")
+}
+
+/** 自动修改输出文件名并定位文件 */
+android.applicationVariants.all {
+    outputs.forEach {
+        if (it.name == "debug") {
+            return@forEach
+        }
+        (it as BaseVariantOutputImpl).outputFileName = "${Properties().apply {
+            load(VERSION_PROPERTIES.inputStream())
+        }[it.name] as String}.apk"
+        val name = StringUtils.capitalize(it.name)
+        tasks.create("package${name}AndLocate") {
+            dependsOn("assemble$name")
+            doLast {
+                var outputFile = it.outputFile
+                if (!outputFile.exists()) {
+                    return@doLast
+                }
+                try {
+                    outputFile = outputFile.copyTo(rootProject.file(
+                        "build/assemble/${outputFile.name}"
+                    ), true)
+                } catch (e: Exception) { }
+                logger.info("outputApkFile: $outputFile")
+                when (true) {
+                    OperatingSystem.current().isWindows ->
+                        Runtime.getRuntime().exec("explorer.exe /select, $outputFile")
+                }
+            }
+        }
+    }
 }

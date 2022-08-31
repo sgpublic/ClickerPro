@@ -1,4 +1,4 @@
-package io.github.sgpublic.clickerpro
+package io.github.clickerpro
 
 import android.app.Application
 import android.content.ContentResolver
@@ -12,7 +12,7 @@ import ch.qos.logback.classic.LoggerContext
 import ch.qos.logback.classic.joran.JoranConfigurator
 import ch.qos.logback.core.joran.spi.JoranException
 import ch.qos.logback.core.util.StatusPrinter
-import io.github.sgpublic.clickerpro.core.util.log
+import io.github.clickerpro.core.util.log
 import org.slf4j.LoggerFactory
 import java.io.IOException
 

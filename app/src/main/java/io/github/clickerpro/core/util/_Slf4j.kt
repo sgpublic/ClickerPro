@@ -1,4 +1,4 @@
-package io.github.sgpublic.clickerpro.core.util
+package io.github.clickerpro.core.util
 
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory

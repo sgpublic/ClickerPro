@@ -1,4 +1,4 @@
-package io.github.sgpublic.clickerpro.core.logback
+package io.github.clickerpro.core.logback
 
 import ch.qos.logback.classic.pattern.ClassicConverter
 import ch.qos.logback.classic.spi.ILoggingEvent

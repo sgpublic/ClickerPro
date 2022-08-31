@@ -1,8 +1,8 @@
-package io.github.sgpublic.clickerpro.core.logback
+package io.github.clickerpro.core.logback
 
 import ch.qos.logback.classic.PatternLayout
 import ch.qos.logback.core.PropertyDefinerBase
-import io.github.sgpublic.clickerpro.Application
+import io.github.clickerpro.Application
 import java.io.File
 import java.io.IOException
 

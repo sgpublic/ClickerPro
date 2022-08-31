@@ -1,6 +1,6 @@
 <configuration>
     <!-- 日志文件目录，默认为 /sdcard/Android/data/{APPLICATION_ID}/cache/log -->
-    <define name="LOG_DIR" class="io.github.sgpublic.clickerpro.core.logback.ExternalLogFileDefiner"/>
+    <define name="LOG_DIR" class="io.github.clickerpro.core.logback.ExternalLogFileDefiner"/>
 
     <contextName>ClickerPro</contextName>
 

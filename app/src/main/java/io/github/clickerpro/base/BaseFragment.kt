@@ -1,4 +1,4 @@
-package io.github.sgpublic.clickerpro.base
+package io.github.clickerpro.base
 
 import android.os.Bundle
 import android.view.LayoutInflater

@@ -1,4 +1,4 @@
-package io.github.sgpublic.clickerpro.core.util
+package io.github.clickerpro.core.util
 
 import android.app.Activity
 import android.content.Context

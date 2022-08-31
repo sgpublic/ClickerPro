@@ -1,4 +1,4 @@
-package io.github.sgpublic.clickerpro.base
+package io.github.clickerpro.base
 
 import android.os.Bundle
 import android.view.View
@@ -9,11 +9,11 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.viewbinding.ViewBinding
 import com.yanzhenjie.sofia.Sofia
-import io.github.sgpublic.clickerpro.Application
-import io.github.sgpublic.clickerpro.R
-import io.github.sgpublic.clickerpro.core.util.finishAll
-import io.github.sgpublic.clickerpro.core.util.register
-import io.github.sgpublic.clickerpro.core.util.unregister
+import io.github.clickerpro.Application
+import io.github.clickerpro.R
+import io.github.clickerpro.core.util.finishAll
+import io.github.clickerpro.core.util.register
+import io.github.clickerpro.core.util.unregister
 
 abstract class BaseActivity<VB : ViewBinding>: AppCompatActivity() {
     private var _binding: VB? = null

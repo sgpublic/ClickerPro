@@ -1,4 +1,4 @@
-package io.github.sgpublic.clickerpro.base
+package io.github.clickerpro.base
 
 import androidx.lifecycle.ViewModel
 import androidx.viewbinding.ViewBinding

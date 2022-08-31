@@ -1,0 +1,43 @@
+<configuration>
+    <!-- 日志文件目录，默认为 /sdcard/Android/data/{APPLICATION_ID}/cache/log -->
+    <define name="LOG_DIR" class="io.github.sgpublic.clickerpro.core.logback.ExternalLogFileDefiner"/>
+
+    <contextName>ClickerPro</contextName>
+
+    <!-- 打印到 logcat 的日志 -->
+    <appender name="logcat" class="ch.qos.logback.classic.android.LogcatAppender">
+        <!-- tag 为 class 的 simpleName，附带 log 位置，点击跳转 -->
+        <tagEncoder>
+            <pattern>%pkgName \(%trace\)</pattern>
+        </tagEncoder>
+        <!-- message 不做特殊处理，如有需要可修改 -->
+        <encoder>
+            <pattern>%msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 输出到文件的日志 -->
+    <appender name="file" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <filter name="ch.qos.logback.classic.filter.LevelFilter">
+            <level>INFO</level>
+        </filter>
+        <file>${LOG_DIR}/facertc.log</file>
+        <!-- 日志分段 -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!-- 分段命名规则 -->
+            <fileNamePattern>${LOG_DIR}/%d{yyyy-MM-dd}/facertc.%i.log</fileNamePattern>
+            <!-- 最大保留天数 -->
+            <MaxHistory>7</MaxHistory>
+            <!-- 单日志文件最大文件大小 -->
+            <maxFileSize>1MB</maxFileSize>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %logger %-5level \(%trace\): %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="ALL">
+        <appender-ref ref="logcat" />
+        <appender-ref ref="file" />
+    </root>
+</configuration>

@@ -1,6 +1,49 @@
 <resources>
-    <string name="app_name">ClickerPro</string>
+    <string name="app_name">Clicker Pro</string>
 
     <string name="text_back_exit">再点击一次退出</string>
     <string name="text_back_exit_notice">请再点击一次退出</string>
+
+    <string name="mode_setting_activity_title">模式设置</string>
+    <string name="mode_setting_activity_overlay_title">悬浮窗权限</string>
+    <string name="mode_setting_activity_overlay_desc">Clicker Pro 需要悬浮窗权限才能正常使用</string>
+    <string name="mode_setting_activity_accessibility_mode">无障碍模式</string>
+    <string name="mode_setting_activity_accessibility_permission_title">无障碍权限</string>
+    <string name="mode_setting_activity_accessibility_permission_desc">启用无障碍权限以开启功能</string>
+    <string name="mode_setting_activity_root_mode">ROOT 模式</string>
+    <string name="mode_setting_activity_root_denied">ROOT 权限获取失败</string>
+    <string name="mode_setting_activity_root_permission_title">ROOT 权限</string>
+    <string name="mode_setting_activity_root_permission_desc">启用 ROOT 权限以开启功能</string>
+
+    <string name="main_activity_mode">当前模式</string>
+    <string name="main_activity_usage">%s - %s</string>
+    <string name="main_activity_service_stop">已停止</string>
+    <string name="main_activity_service_stop_desc">点击启动</string>
+    <string name="main_activity_service_unusable_desc">服务不可用，请前往“模式设置”开启对应服务</string>
+    <string name="main_activity_service_started">正在运行</string>
+    <string name="main_activity_service_started_desc">打开游戏即可看到悬浮窗，使用愉快！</string>
+    <string name="main_activity_service_mode">正在运行服务时请勿切换模式！</string>
+    <string name="main_activity_usable">可用</string>
+    <string name="main_activity_unusable">不可用</string>
+
+    <string name="overlay_item_switcher_on">ON</string>
+    <string name="overlay_item_switcher_off">OFF</string>
+
+    <string name="accessibility_service_description">
+        这是一个适用于《公主连结：Re》简体中文服的出刀辅助工具。
+        \n注意！此工具非“外挂”类辅助，不会修改任何游戏数据！请共同维护公平游戏环境！！！
+        \n
+        \n开启无障碍模式后，Clicker Pro 将：
+        \n监听以下应用：
+        \n - 公主连结R（com.bilibili.priconne）
+        \n TODO：其他服务器企划中
+        \n监听以下事件：
+        \n - 窗口状态变化事件，用于仅当用户打开《公主连结：Re》后开启悬浮窗
+        \n利用无障碍服务的以下功能：
+        \n - 执行手势，用于在《公主连结：Re》游戏内点击卡牌
+        \n
+        \n若 Clicker Pro 被强制停止，无障碍服务则会停止运行，届时请手动重新开启。
+    </string>
+
+    <string name="overlay_prc_title">SMART</string>
 </resources>

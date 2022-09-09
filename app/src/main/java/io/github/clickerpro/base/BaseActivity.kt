@@ -33,11 +33,26 @@ abstract class BaseActivity<VB : ViewBinding>: AppCompatActivity() {
             STATE.putAll(savedInstanceState)
         }
         onViewSetup()
-        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                if (!applyBackPressed()) onBackPressedDispatcher.onBackPressed()
+        onBackPressedDispatcher.addCallback(
+            this,
+            object : OnBackPressedCallback(isActivityAtBottom()) {
+                private var last: Long = -1
+                override fun handleOnBackPressed() {
+                    val now = System.currentTimeMillis()
+                    if (last == -1L) {
+                        Application.onToast(this@BaseActivity, R.string.text_back_exit)
+                        last = now
+                    } else {
+                        if (now - last < 2000) {
+                            finishAll()
+                        } else {
+                            last = now
+                            Application.onToast(this@BaseActivity, R.string.text_back_exit_notice)
+                        }
+                    }
+                }
             }
-        })
+        )
         onActivityCreated(savedInstanceState != null)
     }
 
@@ -101,29 +116,4 @@ abstract class BaseActivity<VB : ViewBinding>: AppCompatActivity() {
     }
 
     protected open fun isActivityAtBottom(): Boolean = false
-
-    private var last: Long = -1
-    private fun applyBackPressed(): Boolean {
-        supportFragmentManager.fragments.forEach {
-            if (it is BaseFragment<*> && it.onBackPressed()) {
-                return true
-            }
-        }
-        if (!isActivityAtBottom()){
-            return false
-        }
-        val now = System.currentTimeMillis()
-        if (last == -1L) {
-            Application.onToast(this, R.string.text_back_exit)
-            last = now
-        } else {
-            if (now - last < 2000) {
-                finishAll()
-            } else {
-                last = now
-                Application.onToast(this, R.string.text_back_exit_notice)
-            }
-        }
-        return true
-    }
 }

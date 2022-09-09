@@ -8,6 +8,7 @@ plugins {
     id("org.jetbrains.kotlin.android") version kotlinVer apply false
     id("org.jetbrains.kotlin.plugin.parcelize") version kotlinVer apply false
     id("org.jetbrains.kotlin.kapt") version kotlinVer apply false
+    id("org.jetbrains.kotlin.jvm") version kotlinVer apply false
 }
 
 task("clean", Delete::class) {

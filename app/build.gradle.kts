@@ -72,10 +72,10 @@ val VERSION_PROPERTIES get() =
     }
 
 android {
-    compileSdk = 33
-    buildToolsVersion = "33.0.0"
+    compileSdk = 32
+    buildToolsVersion = "32.1.0-rc1"
 
-    val properties = file("./sign/sign.properties");
+    val properties = file("./sign/sign.properties")
     val signInfoExit: Boolean = properties.exists()
 
     if (signInfoExit){
@@ -125,6 +125,19 @@ android {
         buildConfigStringField("TYPE_RELEASE", TYPE_RELEASE)
         buildConfigStringField("TYPE_DEV", TYPE_DEV)
         buildConfigStringField("TYPE_SNAPSHOT", TYPE_SNAPSHOT)
+        buildConfigStringField("TYPE_DEBUG", TYPE_DEBUG)
+
+        externalNativeBuild {
+            cmake {
+                cppFlags += ""
+            }
+        }
+
+        ndk {
+            abiFilters.addAll(listOf(
+                "x86", "armeabi-v7a", "x86_64", "arm64-v8a"
+            ))
+        }
     }
 
     buildFeatures {
@@ -153,34 +166,42 @@ android {
         named(TYPE_DEBUG) {
             defaultConfig.versionCode = DATED_VERSION
             isDebuggable = true
-            versionNameSuffix = "-$TIME_MD5-$name"
+            versionNameSuffix = "-$name"
         }
-        register(TYPE_DEV) {
-            versionNameSuffix = "-$GIT_HEAD-$name"
-            isDebuggable = true
-            isTestCoverageEnabled = true
-            versionProps[TYPE_DEV] = "${rootProject.name}_${
-                defaultConfig.versionName
-            }_$GIT_HEAD"
+        if (signInfoExit) {
+            register(TYPE_DEV) {
+                versionNameSuffix = "-$GIT_HEAD-$name"
+                isDebuggable = true
+                isTestCoverageEnabled = true
+                versionProps[TYPE_DEV] = "${rootProject.name}_${
+                    defaultConfig.versionName
+                }_$GIT_HEAD"
+            }
+            register(TYPE_SNAPSHOT) {
+                defaultConfig.versionCode = DATED_VERSION
+                isDebuggable = true
+                val suffix = TIME_MD5
+                versionNameSuffix = "-$suffix-$name"
+                versionProps[TYPE_SNAPSHOT] = "${rootProject.name}_${
+                    defaultConfig.versionName
+                }_$suffix"
+            }
         }
-        register(TYPE_SNAPSHOT) {
-            defaultConfig.versionCode = DATED_VERSION
-            isDebuggable = true
-            val suffix = TIME_MD5
-            versionNameSuffix = "-$suffix-$name"
-            versionProps[TYPE_SNAPSHOT] = "${rootProject.name}_${
-                defaultConfig.versionName
-            }_$suffix"
-        }
-
         versionProps.store(VERSION_PROPERTIES.writer(), null)
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = "11"
+        jvmTarget = "17"
+    }
+
+    externalNativeBuild {
+        cmake {
+            path = file("src/main/cpp/CMakeLists.txt")
+            version = "3.22.1"
+        }
     }
 }
 
@@ -193,11 +214,15 @@ dependencies {
     androidTestImplementation("androidx.test:rules:1.4.0")
 
     implementation("androidx.core:core-ktx:1.8.0")
-    implementation("androidx.appcompat:appcompat:1.4.2")
-    implementation("com.google.android.material:material:1.6.1")
+    implementation("androidx.appcompat:appcompat:1.5.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
-    implementation("androidx.navigation:navigation-fragment-ktx:2.5.0")
+    implementation("androidx.navigation:navigation-fragment-ktx:2.5.2")
+
+    implementation("com.google.android.material:material:1.7.0-beta01")
+//    val material3 = "1.0.0-beta01"
+//    runtimeOnly("androidx.compose.material3:material3:$material3")
+//    implementation("androidx.compose.material3:material3-window-size-class:$material3")
 
     /* https://developer.android.com/reference/kotlin/androidx/core/splashscreen/SplashScreen */
     implementation("androidx.core:core-splashscreen:1.0.0")
@@ -205,6 +230,12 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.7")
     /* https://github.com/yanzhenjie/Sofia */
     implementation("com.yanzhenjie:sofia:1.0.5")
+    /* https://github.com/getActivity/XXPermissions */
+    implementation("com.github.getActivity:XXPermissions:16.0")
+
+//    val lombok = "1.18.16"
+//    compileOnly("org.projectlombok:lombok:$lombok")
+//    annotationProcessor("org.projectlombok:lombok:$lombok")
 
     val roomVer = "2.4.2"
     implementation("androidx.room:room-runtime:$roomVer")
@@ -213,13 +244,13 @@ dependencies {
     kapt("androidx.room:room-compiler:$roomVer")
     testImplementation("androidx.room:room-testing:$roomVer")
 
-    // 日志门面，切勿升级依赖，logback-android 仅支持 1.x
-    //noinspection GradleDependency
-    implementation("org.slf4j:slf4j-api:1.7.26")
+    // 日志门面，切勿升级至 2.x，logback-android 仅支持 1.x
+    implementation("org.slf4j:slf4j-api:1.7.36")
     // 适用于 Android 的 logback：
     // https://github.com/tony19/logback-android
     // 配置文件位于 /assets/logback.xml
     implementation("com.github.tony19:logback-android:2.0.0")
+    implementation(kotlin("reflect"))
 }
 
 /** 自动修改输出文件名并定位文件 */

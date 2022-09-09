@@ -6,6 +6,7 @@
 
     <!-- 打印到 logcat 的日志 -->
     <appender name="logcat" class="ch.qos.logback.classic.android.LogcatAppender">
+        <filter name="io.github.clickerpro.core.logback.ConsoleFilter" />
         <!-- tag 为 class 的 simpleName，附带 log 位置，点击跳转 -->
         <tagEncoder>
             <pattern>%pkgName \(%trace\)</pattern>
@@ -18,7 +19,7 @@
 
     <!-- 输出到文件的日志 -->
     <appender name="file" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <filter name="ch.qos.logback.classic.filter.LevelFilter">
+        <filter name="io.github.clickerpro.core.logback.ClickerLevelFilter">
             <level>INFO</level>
         </filter>
         <file>${LOG_DIR}/facertc.log</file>
@@ -32,7 +33,7 @@
             <maxFileSize>1MB</maxFileSize>
         </rollingPolicy>
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <pattern>%d{HH:mm:ss.SSS} [%thread] %logger %-5level \(%trace\): %msg%n</pattern>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %logger %-5level \(%trace\): %msg%n</pattern>
         </encoder>
     </appender>
 

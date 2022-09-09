@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/mode_setting_overlay"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent"
+            android:paddingHorizontal="24dp"
+            android:paddingVertical="10dp"
+            android:foreground="?selectableItemBackground">
+            <TextView
+                android:id="@+id/fragment_mode_detail_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="2dp"
+                app:layout_constraintTop_toTopOf="@id/fragment_mode_detail_switch"
+                app:layout_constraintBottom_toTopOf="@id/fragment_mode_detail_desc"
+                app:layout_constraintLeft_toLeftOf="parent"
+                android:textSize="16sp"
+                android:textColor="@color/colorPrimaryText" />
+            <TextView
+                android:id="@+id/fragment_mode_detail_desc"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toBottomOf="@id/fragment_mode_detail_switch"
+                app:layout_constraintTop_toBottomOf="@id/fragment_mode_detail_title"
+                app:layout_constraintLeft_toLeftOf="parent"
+                android:textSize="14sp"
+                android:textColor="@color/colorSecondaryText" />
+            <com.google.android.material.materialswitch.MaterialSwitch
+                android:id="@+id/fragment_mode_detail_switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintRight_toRightOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
+</ScrollView>

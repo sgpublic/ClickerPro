@@ -4,14 +4,16 @@ import android.app.Application
 import android.content.ContentResolver
 import android.content.Context
 import android.content.res.Configuration
+import android.util.DisplayMetrics
 import android.widget.Toast
-import androidx.annotation.ColorRes
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import ch.qos.logback.classic.LoggerContext
 import ch.qos.logback.classic.joran.JoranConfigurator
 import ch.qos.logback.core.joran.spi.JoranException
 import ch.qos.logback.core.util.StatusPrinter
+import io.github.clickerpro.core.util.Clicker
+import io.github.clickerpro.core.util.Slf4j
 import io.github.clickerpro.core.util.log
 import org.slf4j.LoggerFactory
 import java.io.IOException
@@ -22,6 +24,10 @@ class Application : Application() {
         application = this
         loadLogbackConfig()
         log.info("APP启动")
+        // debug 环境下使用 root 自动启动无障碍服务
+        if (Clicker.Root.openAccessibility()) {
+            log.warn("已使用 ROOT 自动启动无障碍服务！")
+        }
     }
 
     private fun loadLogbackConfig() {
@@ -39,12 +45,21 @@ class Application : Application() {
         }
     }
 
+    override fun onTerminate() {
+        Slf4j.clear()
+        super.onTerminate()
+    }
 
     companion object {
         private lateinit var application: Application
 
+        val APPLICATION: Application get() = application
+
         val APPLICATION_CONTEXT: Context get() = application.applicationContext
+
         val CONTENT_RESOLVER: ContentResolver get() = APPLICATION_CONTEXT.contentResolver
+
+        val DISPLAY_METRICS: DisplayMetrics get() = APPLICATION_CONTEXT.resources.displayMetrics
 
         val IS_NIGHT_MODE: Boolean get() = APPLICATION_CONTEXT.resources.configuration.uiMode and
                 Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
@@ -74,8 +89,15 @@ class Application : Application() {
             return APPLICATION_CONTEXT.resources.getString(textId, *arg)
         }
 
-        fun getColor(@ColorRes colorId: Int): Int {
-            return APPLICATION_CONTEXT.getColor(colorId)
+        inline fun <reified T> getSystemService(): T {
+            return APPLICATION_CONTEXT.getSystemService(T::class.java)
+        }
+
+        inline fun <reified T> getSystemService(id: String): T {
+            APPLICATION_CONTEXT.getSystemService(id).let {
+                if (it is T) { return it }
+                throw TypeCastException("service of $id is not '${T::class.qualifiedName}' but '${it.javaClass.name}'")
+            }
         }
     }
 }

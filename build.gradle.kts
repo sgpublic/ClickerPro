@@ -1,7 +1,7 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 plugins {
-    val androidVer = "7.2.2"
-    id("com.android.application") version "7.2.2" apply false
+    val androidVer = "7.3.0"
+    id("com.android.application") version "7.3.0" apply false
     id("com.android.library") version androidVer apply false
 
     val kotlinVer = "1.7.10"

@@ -9,24 +9,24 @@
         <filter name="io.github.clickerpro.core.logback.ConsoleFilter" />
         <!-- tag 为 class 的 simpleName，附带 log 位置，点击跳转 -->
         <tagEncoder>
-            <pattern>%pkgName \(%trace\)</pattern>
+            <pattern>%pkgName</pattern>
         </tagEncoder>
         <!-- message 不做特殊处理，如有需要可修改 -->
         <encoder>
-            <pattern>%msg%n</pattern>
+            <pattern>\(%trace\) %msg%n</pattern>
         </encoder>
     </appender>
 
     <!-- 输出到文件的日志 -->
     <appender name="file" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <filter name="io.github.clickerpro.core.logback.ClickerLevelFilter">
-            <level>INFO</level>
+        <filter name="io.github.clickerpro.core.logback.FileFilter">
+            <level>DEBUG</level>
         </filter>
-        <file>${LOG_DIR}/facertc.log</file>
+        <file>${LOG_DIR}/clicker-pro.log</file>
         <!-- 日志分段 -->
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <!-- 分段命名规则 -->
-            <fileNamePattern>${LOG_DIR}/%d{yyyy-MM-dd}/facertc.%i.log</fileNamePattern>
+            <fileNamePattern>${LOG_DIR}/%d{yyyy-MM-dd}/clicker-pro.%i.log</fileNamePattern>
             <!-- 最大保留天数 -->
             <MaxHistory>7</MaxHistory>
             <!-- 单日志文件最大文件大小 -->

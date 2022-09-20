@@ -26,6 +26,14 @@ object ConfigManager {
         putBoolean(KEY_ROOT, value)
     }
 
+    private const val KEY_OVERLAY_X = "overlay_x"
+    var OVERLAY_X: Int get() = getInt(KEY_OVERLAY_X, 0)
+    set(value) { putInt(KEY_OVERLAY_X, value) }
+
+    private const val KEY_OVERLAY_Y = "overlay_y"
+    var OVERLAY_Y: Int get() = getInt(KEY_OVERLAY_Y, 200)
+        set(value) { putInt(KEY_OVERLAY_Y, value) }
+
 
     private fun getString(key: String, defValue: String = "") =
         sharedPreferences.getString(key, defValue).toString()

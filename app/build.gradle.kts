@@ -72,8 +72,8 @@ val VERSION_PROPERTIES get() =
     }
 
 android {
-    compileSdk = 32
-    buildToolsVersion = "32.1.0-rc1"
+    compileSdk = 33
+    buildToolsVersion = "33.0.0"
 
     val properties = file("./sign/sign.properties")
     val signInfoExit: Boolean = properties.exists()
@@ -96,8 +96,9 @@ android {
         }
     }
 
+    namespace = "io.github.clickerpro"
     defaultConfig {
-        applicationId = "io.github.clickerpro"
+        applicationId = namespace
         minSdk = 26
         targetSdk = 33
         versionCode = COMMIT_VERSION
@@ -127,17 +128,17 @@ android {
         buildConfigStringField("TYPE_SNAPSHOT", TYPE_SNAPSHOT)
         buildConfigStringField("TYPE_DEBUG", TYPE_DEBUG)
 
-        externalNativeBuild {
-            cmake {
-                cppFlags += ""
-            }
-        }
-
-        ndk {
-            abiFilters.addAll(listOf(
-                "x86", "armeabi-v7a", "x86_64", "arm64-v8a"
-            ))
-        }
+//        externalNativeBuild {
+//            cmake {
+//                cppFlags += ""
+//            }
+//        }
+//
+//        ndk {
+//            abiFilters.addAll(listOf(
+//                "x86", "armeabi-v7a", "x86_64", "arm64-v8a"
+//            ))
+//        }
     }
 
     buildFeatures {
@@ -172,7 +173,7 @@ android {
             register(TYPE_DEV) {
                 versionNameSuffix = "-$GIT_HEAD-$name"
                 isDebuggable = true
-                isTestCoverageEnabled = true
+                enableAndroidTestCoverage = true
                 versionProps[TYPE_DEV] = "${rootProject.name}_${
                     defaultConfig.versionName
                 }_$GIT_HEAD"
@@ -180,6 +181,7 @@ android {
             register(TYPE_SNAPSHOT) {
                 defaultConfig.versionCode = DATED_VERSION
                 isDebuggable = true
+                enableAndroidTestCoverage = true
                 val suffix = TIME_MD5
                 versionNameSuffix = "-$suffix-$name"
                 versionProps[TYPE_SNAPSHOT] = "${rootProject.name}_${
@@ -197,12 +199,12 @@ android {
         jvmTarget = "17"
     }
 
-    externalNativeBuild {
-        cmake {
-            path = file("src/main/cpp/CMakeLists.txt")
-            version = "3.22.1"
-        }
-    }
+//    externalNativeBuild {
+//        cmake {
+//            path = file("src/main/cpp/CMakeLists.txt")
+//            version = "3.22.1"
+//        }
+//    }
 }
 
 dependencies {
@@ -213,13 +215,13 @@ dependencies {
     androidTestImplementation("androidx.test:runner:1.4.0")
     androidTestImplementation("androidx.test:rules:1.4.0")
 
-    implementation("androidx.core:core-ktx:1.8.0")
-    implementation("androidx.appcompat:appcompat:1.5.0")
+    implementation("androidx.core:core-ktx:1.9.0")
+    implementation("androidx.appcompat:appcompat:1.5.1")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
     implementation("androidx.navigation:navigation-fragment-ktx:2.5.2")
 
-    implementation("com.google.android.material:material:1.7.0-beta01")
+    implementation("com.google.android.material:material:1.7.0-rc01")
 //    val material3 = "1.0.0-beta01"
 //    runtimeOnly("androidx.compose.material3:material3:$material3")
 //    implementation("androidx.compose.material3:material3-window-size-class:$material3")
@@ -259,9 +261,11 @@ android.applicationVariants.all {
         if (it.name == "debug") {
             return@forEach
         }
-        (it as BaseVariantOutputImpl).outputFileName = "${Properties().apply {
-            load(VERSION_PROPERTIES.inputStream())
-        }[it.name] as String}.apk"
+        (it as BaseVariantOutputImpl).outputFileName = "${
+            Properties().apply { 
+                load(VERSION_PROPERTIES.inputStream()) 
+            }[it.name] as String
+        }.apk"
         val name = StringUtils.capitalize(it.name)
         tasks.create("package${name}AndLocate") {
             dependsOn("assemble$name")
@@ -274,7 +278,7 @@ android.applicationVariants.all {
                     outputFile = outputFile.copyTo(rootProject.file(
                         "build/assemble/${outputFile.name}"
                     ), true)
-                } catch (e: Exception) { }
+                } catch (_: Exception) { }
                 logger.info("outputApkFile: $outputFile")
                 when (true) {
                     OperatingSystem.current().isWindows ->

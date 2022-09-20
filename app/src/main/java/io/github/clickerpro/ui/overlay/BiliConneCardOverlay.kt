@@ -72,10 +72,8 @@ class BiliConneCardOverlay(context: Context):
         (size.screenHeight - size.seat()).let {
             yRange = (it - size.cardSize()) .. it
         }
-        ((size.screenWidth - size.width()) / 2.0).let {
-            Cards.forEachIndexed { index, imageView ->
-                xRanges[index] = (it + imageView.x).roundToInt() .. (it + imageView.x + size.cardSize()).roundToInt()
-            }
+        Cards.forEachIndexed { index, imageView ->
+            xRanges[index] = imageView.x.roundToInt() .. (imageView.x + size.cardSize()).roundToInt()
         }
         CardCover?.show()
     }
@@ -84,11 +82,12 @@ class BiliConneCardOverlay(context: Context):
         Size(Application.DISPLAY_METRICS)
     }
     override fun onSetupLayoutParams(lp: WindowManager.LayoutParams) {
+        lp.type = WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY
         lp.gravity = Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL
-        lp.width = size.width()
-        lp.height = size.height()
-        lp.y = size.seat()
-        lp.flags = lp.flags or WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
+        lp.width = WindowManager.LayoutParams.MATCH_PARENT
+        lp.height = WindowManager.LayoutParams.MATCH_PARENT
+        lp.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE or
+                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
     }
 
     override fun onSetupView() {
@@ -97,6 +96,7 @@ class BiliConneCardOverlay(context: Context):
             card.layoutParams = (card.layoutParams as ConstraintLayout.LayoutParams).also {
                 it.width = size.cardSize()
                 it.height = size.cardSize()
+                it.bottomMargin = size.seat()
                 when(index) {
                     0, 1 -> it.marginEnd = size.divider()
                     3, 4 -> it.marginStart = size.divider()

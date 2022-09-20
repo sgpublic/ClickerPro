@@ -7,8 +7,9 @@ import io.github.clickerpro.BuildConfig
 class PkgNameConverter : ClassicConverter() {
     override fun convert(event: ILoggingEvent): String {
         var loggerName = event.loggerName
-        if (loggerName.startsWith(BuildConfig.APPLICATION_ID))
+        if (loggerName.startsWith(BuildConfig.APPLICATION_ID)) {
             loggerName = loggerName.substring(BuildConfig.APPLICATION_ID.length)
+        }
         return loggerName
     }
 }

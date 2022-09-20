@@ -9,6 +9,7 @@ import android.provider.Settings
 import android.view.accessibility.AccessibilityEvent
 import androidx.lifecycle.MutableLiveData
 import io.github.clickerpro.Application
+import io.github.clickerpro.BuildConfig
 import io.github.clickerpro.base.BaseOverlayWidget
 import io.github.clickerpro.core.manager.ConfigManager
 import io.github.clickerpro.core.manager.RuntimeValues
@@ -30,10 +31,14 @@ class ClickerAccessibilityService: AccessibilityService() {
         registerReceiver(receiver, IntentFilter(Intent.ACTION_CONFIGURATION_CHANGED))
     }
 
+    @Suppress("KotlinConstantConditions")
     private val receiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             if (Orientation.CURRENT != Orientation.LANDSCAPE) {
                 Switcher?.hide()
+            } else if (BuildConfig.BUILD_TYPE == BuildConfig.TYPE_SNAPSHOT
+                || BuildConfig.BUILD_TYPE == BuildConfig.TYPE_DEBUG) {
+                createSwitcherOverlay()
             }
         }
     }
@@ -66,14 +71,18 @@ class ClickerAccessibilityService: AccessibilityService() {
                 "  packageName: ${event.packageName}")
         if (event.eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) {
             if ("com.bilibili.priconne" == event.packageName) {
-                if (canCreate && Switcher == null) {
-                    Switcher = BaseOverlayWidget.create(Application.APPLICATION_CONTEXT)
-                    Switcher?.create()
-                }
-                if (RuntimeValues.OVERLAY_OPEN) {
-                    Switcher?.show()
-                }
+                createSwitcherOverlay()
             }
+        }
+    }
+
+    private fun createSwitcherOverlay() {
+        if (canCreate && Switcher == null) {
+            Switcher = BaseOverlayWidget.create(Application.APPLICATION_CONTEXT)
+            Switcher?.create()
+        }
+        if (RuntimeValues.OVERLAY_OPEN) {
+            Switcher?.show()
         }
     }
 
@@ -83,6 +92,7 @@ class ClickerAccessibilityService: AccessibilityService() {
 
     override fun onDestroy() {
         log.info("onDestroy")
+        unregisterReceiver(receiver)
         STARTED.postValue(false)
         destroyOverlay()
         instance = null

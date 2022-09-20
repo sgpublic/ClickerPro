@@ -5,6 +5,7 @@ import android.content.Context
 import android.graphics.PixelFormat
 import android.view.MotionEvent
 import android.view.View
+import android.view.View.OnTouchListener
 import android.view.WindowManager
 import androidx.annotation.CallSuper
 import androidx.lifecycle.Lifecycle
@@ -14,18 +15,19 @@ import androidx.viewbinding.ViewBinding
 import io.github.clickerpro.core.util.Orientation
 import io.github.clickerpro.core.util.log
 import io.github.clickerpro.core.util.take
+import kotlin.math.absoluteValue
 
-abstract class BaseOverlayWidget<VB: ViewBinding>(protected val context: Context):
-    View.OnTouchListener, LifecycleOwner {
+abstract class BaseOverlayWidget<VB: ViewBinding>(
+    protected val context: Context,
+): LifecycleOwner {
     protected abstract val ViewBinding: VB
-    private val LayoutParams = WindowManager.LayoutParams().also {
+    protected val LayoutParams = WindowManager.LayoutParams().also {
         it.width = WindowManager.LayoutParams.WRAP_CONTENT
         it.height = WindowManager.LayoutParams.WRAP_CONTENT
         it.type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
         it.format = PixelFormat.TRANSLUCENT
-        it.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or
-                WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON or
-                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+        it.flags = WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON or
+                WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
     }
 
     protected open fun beforeCreate() { }
@@ -95,37 +97,50 @@ abstract class BaseOverlayWidget<VB: ViewBinding>(protected val context: Context
     @SuppressLint("ClickableViewAccessibility")
     @CallSuper
     open fun onSetupView() {
-        ViewBinding.root.setOnTouchListener { _, _ -> false }
-        DRAG_VIEW?.setOnTouchListener(this)
+        DRAG_VIEW?.setOnTouchListener(object : OnTouchListener {
+            private var lastX = 0f
+            private var lastY = 0f
+            private var downX = 0f
+            private var downY = 0f
+            override fun onTouch(v: View, event: MotionEvent): Boolean {
+                log.debug("overlay onTouch(event: ${actions[event.action] ?: "ACTION_UNKNOWN"})")
+                when (event.action) {
+                    MotionEvent.ACTION_DOWN -> {
+                        lastX = event.rawX
+                        lastY = event.rawY
+                        downX = event.rawX
+                        downY = event.rawY
+                    }
+                    MotionEvent.ACTION_MOVE -> {
+                        LayoutParams.x += (event.rawX - lastX).toInt()
+                        LayoutParams.y += (event.rawY - lastY).toInt()
+                        WindowManagerService.updateViewLayout(ViewBinding.root, LayoutParams)
+                        lastX = event.rawX
+                        lastY = event.rawY
+                        onOverlayDrag(lastX, lastY)
+                    }
+                    MotionEvent.ACTION_UP -> {
+                        if ((event.rawX - downX).absoluteValue < 10 &&
+                            (event.rawY - downY).absoluteValue < 10) {
+                            v.performClick()
+                        }
+                    }
+                }
+                return true
+            }
+        })
     }
+
+    protected open fun onOverlayDrag(x: Float, y: Float) { }
 
     protected open val DRAG_VIEW: View? = null
 
-    private var lastX = 0f
-    private var lastY = 0f
-    private var moved = false
-    override fun onTouch(v: View, event: MotionEvent): Boolean {
-        var ret = false
-        when (event.action) {
-            MotionEvent.ACTION_DOWN -> {
-                lastX = event.rawX
-                lastY = event.rawY
-                moved = false
-                ret = true
-            }
-            MotionEvent.ACTION_MOVE -> {
-                LayoutParams.x += (event.rawX - lastX).toInt()
-                LayoutParams.y += (event.rawY - lastY).toInt()
-                WindowManagerService.updateViewLayout(ViewBinding.root, LayoutParams)
-                lastX = event.rawX
-                lastY = event.rawY
-                moved = true
-            }
-            MotionEvent.ACTION_UP -> {
-                if (!moved) v.performClick()
-            }
+    private val actions: Map<Int, String> = hashMapOf<Int, String>().also {
+        MotionEvent::class.java.fields.filter {
+            return@filter it.name.startsWith("ACTION_")
+        }.forEach { field ->
+            it[field.getInt(null)] = field.name
         }
-        return ret
     }
 
     private val lifecycleOwner: LifecycleRegistry by lazy {

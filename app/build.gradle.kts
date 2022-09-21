@@ -99,7 +99,7 @@ android {
     namespace = "io.github.clickerpro"
     defaultConfig {
         applicationId = namespace
-        minSdk = 26
+        minSdk = 28
         targetSdk = 33
         versionCode = COMMIT_VERSION
         versionName = "1.0.0"

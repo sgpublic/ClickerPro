@@ -88,6 +88,7 @@ class BiliConneCardOverlay(context: Context):
         lp.height = WindowManager.LayoutParams.MATCH_PARENT
         lp.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE or
                 WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+        lp.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
     }
 
     override fun onSetupView() {

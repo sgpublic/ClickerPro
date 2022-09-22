@@ -225,6 +225,7 @@ object Clicker {
         }
 
         fun openAccessibility(): Boolean {
+            @Suppress("KotlinConstantConditions")
             if (BuildConfig.BUILD_TYPE != BuildConfig.TYPE_DEBUG) {
                 log.debug("当前非 debug 环境，跳过启动无障碍服务。")
                 return false

@@ -52,26 +52,32 @@ class BiliConneCardOverlay(context: Context):
                 Cards[index].imageTintList = ColorStateList.valueOf(context.getColor(
                     checked.take(R.color.overlay_bilibili_priconne_card, R.color.home_switcher_common)
                 ))
-                if (checked) {
-                    val card = xRanges[index]
-                    val point = Clicker.Point(
-                        (card.first + card.last) / 2,
-                        (yRange.first + yRange.last) / 2
-                    )
-                    log.debug("开始点击：$point")
-                    Clicker.startClick(point, index)
-                } else {
+                if (!checked) {
                     Clicker.stopClick(index)
+                    return@observe
                 }
+                for (i in 0 until ViewModel.CARD_CLICK.size) {
+                    if (i != index) {
+                        ViewModel.CARD_CLICK[i].postValue(false)
+                    }
+                }
+                val card = xRanges[index]
+                val point = Clicker.Point(
+                    (card.first + card.last) / 2,
+                    (yRange.first + yRange.last) / 2
+                )
+                log.debug("开始点击：$point")
+                Clicker.startClick(point, index)
             }
         }
     }
 
     private var CardCover: BiliConneCardItemSwitcherOverlay? = null
     override fun onShow() {
-        (size.screenHeight - size.seat()).let {
-            yRange = (it - size.cardSize()) .. it
-        }
+        yRange = Cards[0].top .. Cards[0].bottom
+//        (size.screenHeight - size.seat()).let {
+//            yRange = (it - size.cardSize()) .. it
+//        }
         Cards.forEachIndexed { index, imageView ->
             xRanges[index] = imageView.x.roundToInt() .. (imageView.x + size.cardSize()).roundToInt()
         }

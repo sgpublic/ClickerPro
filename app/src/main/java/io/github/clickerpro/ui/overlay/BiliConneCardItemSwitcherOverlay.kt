@@ -84,6 +84,7 @@ class BiliConneCardItemSwitcherOverlay(
         lp.height = (30 + cardElevation * 2).dp
         lp.gravity = Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL
         lp.y = size.seat() + size.height() + 10.dp
+        lp.flags = lp.flags or WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
         lp.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
     }
 

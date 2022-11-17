@@ -1,3 +1,3 @@
 [submodule "sign"]
 	path = app/sign
-	url = https://github.com/sgpublic/private-sign
+	url = https://github.com/mhmzx/private-sign.git
